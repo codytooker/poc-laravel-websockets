@@ -1,6 +1,7 @@
 <?php
 
 use App\Http\Controllers\DashboardController;
+use App\Http\Controllers\DraftController;
 use App\Http\Controllers\PlayerController;
 use Illuminate\Support\Facades\Route;
 use Inertia\Inertia;
@@ -12,6 +13,9 @@ Route::get('/', function () {
 Route::middleware(['auth', 'verified'])->group(function () {
     Route::get('dashboard', DashboardController::class)->name('dashboard');
     Route::get('players/{player}', [PlayerController::class, 'show'])->name('players.show');
+
+    Route::post('drafts', [DraftController::class, 'store'])->name('drafts.store');
+    Route::get('drafts/{draft}', [DraftController::class, 'show'])->name('drafts.show');
 });
 
 require __DIR__.'/settings.php';
