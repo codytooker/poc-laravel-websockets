@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Models\Draft;
+use App\Models\Player;
 
 class DraftController extends Controller
 {
@@ -15,8 +16,11 @@ class DraftController extends Controller
 
     public function show(Draft $draft)
     {
+        $players = Player::orderBy('first_name')->get();
+
         return inertia('draft/show', [
             'draft' => $draft,
+            'players' => $players,
         ]);
     }
 }

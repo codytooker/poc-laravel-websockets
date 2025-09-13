@@ -9,4 +9,20 @@ class Draft extends Model
 {
     /** @use HasFactory<\Database\Factories\DraftFactory> */
     use HasFactory;
+
+    public function start(): void
+    {
+        $this->status = 'active';
+        $this->started_at = now();
+
+        $this->save();
+    }
+
+    public function complete(): void
+    {
+        $this->status = 'complete';
+        $this->completed_at = now();
+
+        $this->save();
+    }
 }
