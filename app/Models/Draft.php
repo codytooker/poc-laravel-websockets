@@ -10,6 +10,11 @@ class Draft extends Model
     /** @use HasFactory<\Database\Factories\DraftFactory> */
     use HasFactory;
 
+    public function picks()
+    {
+        return $this->hasMany(DraftPicks::class);
+    }
+
     public function start(): void
     {
         $this->status = 'active';

@@ -17,7 +17,7 @@ class DatabaseSeeder extends Seeder
             'email' => 'test@example.com',
         ]);
 
-        Player::factory(300)->create();
+        Player::factory(240)->create();
 
         $teamNames = [
             'Arizona Diamondbacks',

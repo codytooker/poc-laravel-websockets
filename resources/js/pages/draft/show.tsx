@@ -1,3 +1,13 @@
+/*
+    TODO:
+
+    next make an action to start the draft
+        - this should 
+
+    then make an action to complete the draft
+
+*/
+
 import ActiveDraftController from '@/actions/App/Http/Controllers/ActiveDraftController';
 import { Button } from '@/components/ui/button';
 import AppLayout from '@/layouts/app-layout';

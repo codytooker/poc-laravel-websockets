@@ -14,6 +14,8 @@ return new class extends Migration
         Schema::create('drafts', function (Blueprint $table) {
             $table->id();
             $table->string('status')->default('pending');
+            $table->integer('rounds');
+            $table->integer('time_per_pick');
             $table->timestamp('started_at')->nullable();
             $table->timestamp('completed_at')->nullable();
             $table->timestamps();
