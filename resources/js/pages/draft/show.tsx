@@ -4,9 +4,10 @@ import { Button } from '@/components/ui/button';
 import AppLayout from '@/layouts/app-layout';
 import { destroy } from '@/routes/active-drafts';
 import { Form, Link } from '@inertiajs/react';
+import clsx from 'clsx';
 
 export default function ShowDraft({ draft, players }) {
-    console.log(draft);
+    const pickedPlayerIds = draft.picks.map((pick) => pick.player_id).filter(Boolean);
     return (
         <AppLayout>
             <div className="grid gap-6">
@@ -39,7 +40,12 @@ export default function ShowDraft({ draft, players }) {
                 <h2 className="text-xl font-bold">Available Players</h2>
                 <div className="grid grid-cols-6 gap-2">
                     {players.map((player) => (
-                        <div key={player.id} className="rounded-lg bg-accent px-4 py-2">
+                        <div
+                            key={player.id}
+                            className={clsx('rounded-lg bg-accent px-4 py-2', {
+                                'bg-red-500/10': pickedPlayerIds.includes(player.id),
+                            })}
+                        >
                             {player.first_name} {player.last_name} - {player.position}
                         </div>
                     ))}

@@ -18,6 +18,8 @@ return new class extends Migration
             $table->foreignId('player_id')->nullable()->constrained()->onDelete('cascade');
             $table->integer('round');
             $table->integer('pick_number');
+            $table->string('status')->default('pending');
+            $table->timestamp('picked_at')->nullable();
             $table->timestamps();
         });
     }
