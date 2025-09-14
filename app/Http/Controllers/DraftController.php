@@ -22,6 +22,7 @@ class DraftController extends Controller
     public function show(Draft $draft)
     {
         $players = Player::orderBy('first_name')->get();
+        $draft->load(['picks.team', 'picks.player'])->orderBy(['round', 'pick_number']);
 
         return inertia('draft/show', [
             'draft' => $draft,
