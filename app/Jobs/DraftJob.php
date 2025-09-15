@@ -21,18 +21,12 @@ class DraftJob implements ShouldQueue
 
     public function handle(): void
     {
-        logger("processing job {$this->pickNumber}");
-
         if ($this->draft->status === 'complete') {
-            logger('draft already completed, exiting job');
-
             return;
         }
 
         DB::transaction(function () {
             if (is_null($this->pickNumber)) {
-                logger('no pick number, processing next pick');
-
                 return $this->processNextPick();
             }
 
@@ -49,9 +43,7 @@ class DraftJob implements ShouldQueue
             ->where('pick_number', $this->pickNumber)
             ->first();
 
-        logger($draftPick);
         if (! $draftPick) {
-            logger("Draft pick not found for pick number: {$this->pickNumber}");
             throw new \Exception("Draft pick not found for pick number: {$this->pickNumber}");
         }
 
@@ -79,10 +71,7 @@ class DraftJob implements ShouldQueue
             ->orderBy('pick_number')
             ->first();
 
-        logger('next pick', ['nextPick' => $nextPick]);
-
         if ($nextPick) {
-            logger("Next pick is #{$nextPick->pick_number} for team ID {$nextPick->team_id}");
             $nextPick->status = 'on_the_clock';
             $nextPick->save();
 

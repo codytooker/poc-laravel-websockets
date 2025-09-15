@@ -9,13 +9,10 @@ import clsx from 'clsx';
 import { useState } from 'react';
 
 export default function ShowDraft({ draft, players }) {
-    console.log({ draft, players });
     const [pickedPlayerIds, setPickedPlayerIds] = useState(draft.picks.map((pick) => pick.player_id).filter(Boolean));
     const [picks, setPicks] = useState(draft.picks);
 
     useEchoPublic(`draft.${draft.id}`, '.pick.made', ({ currentPick, nextPick }) => {
-        console.log({ currentPick, nextPick });
-
         setPickedPlayerIds((ids) => [...ids, currentPick.player_id]);
         setPicks((picks) => {
             return picks.map((pick) => {
@@ -33,7 +30,6 @@ export default function ShowDraft({ draft, players }) {
     });
 
     const startDraft = () => {
-        console.log('Starting draft...');
         const [firstPick, ...restPicks] = picks;
         setPicks([{ ...firstPick, status: 'on_the_clock' }, ...restPicks]);
     };
