@@ -2,10 +2,11 @@
 
 namespace App\Jobs;
 
+use App\Events\PickMade;
 use App\Models\Draft;
+use App\Models\DraftPicks;
 use App\Models\Player;
 use Illuminate\Contracts\Queue\ShouldQueue;
-use Illuminate\Foundation\Bus\PendingDispatch;
 use Illuminate\Foundation\Queue\Queueable;
 use Illuminate\Support\Facades\DB;
 
@@ -35,12 +36,14 @@ class DraftJob implements ShouldQueue
                 return $this->processNextPick();
             }
 
-            $this->makePick();
-            $this->processNextPick();
+            $currentPick = $this->makePick();
+            $nextPick = $this->processNextPick();
+
+            PickMade::dispatch($currentPick->load('player'), $nextPick);
         });
     }
 
-    private function makePick(): void
+    private function makePick(): DraftPicks
     {
         $draftPick = $this->draft->picks()
             ->where('pick_number', $this->pickNumber)
@@ -65,9 +68,11 @@ class DraftJob implements ShouldQueue
         $draftPick->status = 'completed';
         $draftPick->picked_at = now();
         $draftPick->save();
+
+        return $draftPick;
     }
 
-    private function processNextPick(): ?PendingDispatch
+    private function processNextPick(): ?DraftPicks
     {
         $nextPick = $this->draft->picks()
             ->where('status', 'pending')
@@ -81,8 +86,10 @@ class DraftJob implements ShouldQueue
             $nextPick->status = 'on_the_clock';
             $nextPick->save();
 
-            return self::dispatch($this->draft, $nextPick->pick_number)
+            self::dispatch($this->draft, $nextPick->pick_number)
                 ->delay(now()->addSeconds($this->draft->time_per_pick));
+
+            return $nextPick;
         }
 
         $this->draft->complete();

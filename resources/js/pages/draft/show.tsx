@@ -4,10 +4,40 @@ import { Button } from '@/components/ui/button';
 import AppLayout from '@/layouts/app-layout';
 import { destroy } from '@/routes/active-drafts';
 import { Form, Link } from '@inertiajs/react';
+import { useEchoPublic } from '@laravel/echo-react';
 import clsx from 'clsx';
+import { useState } from 'react';
 
 export default function ShowDraft({ draft, players }) {
-    const pickedPlayerIds = draft.picks.map((pick) => pick.player_id).filter(Boolean);
+    console.log({ draft, players });
+    const [pickedPlayerIds, setPickedPlayerIds] = useState(draft.picks.map((pick) => pick.player_id).filter(Boolean));
+    const [picks, setPicks] = useState(draft.picks);
+
+    useEchoPublic(`draft.${draft.id}`, '.pick.made', ({ currentPick, nextPick }) => {
+        console.log({ currentPick, nextPick });
+
+        setPickedPlayerIds((ids) => [...ids, currentPick.player_id]);
+        setPicks((picks) => {
+            return picks.map((pick) => {
+                if (pick.id === currentPick.id) {
+                    return { ...pick, player_id: currentPick.player_id, player: currentPick.player, status: 'completed' };
+                }
+
+                if (pick.id === nextPick.id) {
+                    return { ...pick, status: 'on_the_clock' };
+                }
+
+                return pick;
+            });
+        });
+    });
+
+    const startDraft = () => {
+        console.log('Starting draft...');
+        const [firstPick, ...restPicks] = picks;
+        setPicks([{ ...firstPick, status: 'on_the_clock' }, ...restPicks]);
+    };
+
     return (
         <AppLayout>
             <div className="grid gap-6">
@@ -18,7 +48,7 @@ export default function ShowDraft({ draft, players }) {
                     <p>Completed At: {draft.completed_at ?? 'N/A'}</p>
 
                     {draft.status === 'pending' && (
-                        <Form {...ActiveDraftController.store.form()}>
+                        <Form {...ActiveDraftController.store.form()} onSubmitComplete={startDraft}>
                             <input type="hidden" name="draft_id" value={draft.id} />
                             <Button type="submit">Start Draft</Button>
                         </Form>
@@ -33,7 +63,7 @@ export default function ShowDraft({ draft, players }) {
                     )}
                 </div>
                 <div className="mt-4 flex items-center gap-2 overflow-x-scroll">
-                    {draft.picks.map((draftPick) => (
+                    {picks.map((draftPick) => (
                         <DraftPick key={draftPick.id} draftPick={draftPick} />
                     ))}
                 </div>
@@ -42,7 +72,7 @@ export default function ShowDraft({ draft, players }) {
                     {players.map((player) => (
                         <div
                             key={player.id}
-                            className={clsx('rounded-lg bg-accent px-4 py-2', {
+                            className={clsx('rounded-lg bg-accent px-4 py-2 transition-colors duration-300', {
                                 'bg-red-500/10': pickedPlayerIds.includes(player.id),
                             })}
                         >
