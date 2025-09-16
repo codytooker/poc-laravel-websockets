@@ -1,0 +1,47 @@
+<!doctype html>
+<html lang="en">
+    <head>
+        <meta charset="UTF-8" />
+        <title>WebSocket Test Client</title>
+    </head>
+    <body>
+        <h2>WebSocket Test Client</h2>
+
+        <input type="text" id="messageInput" placeholder="Type a message" />
+        <button id="sendBtn">Send</button>
+
+        <ul id="messages"></ul>
+
+        <script>
+            // Connect to Node.js WebSocket server
+            const ws = new WebSocket('ws://localhost:8081');
+
+            const messagesList = document.getElementById('messages');
+            const input = document.getElementById('messageInput');
+            const sendBtn = document.getElementById('sendBtn');
+
+            ws.onopen = () => {
+                console.log('Connected to WebSocket server');
+                const li = document.createElement('li');
+                li.textContent = 'Connected to server';
+                messagesList.appendChild(li);
+            };
+
+            sendBtn.addEventListener('click', () => {
+                const message = input.value.trim();
+                if (message) {
+                    ws.send(message);
+                    const li = document.createElement('li');
+                    li.textContent = `You: ${message}`;
+                    messagesList.appendChild(li);
+                    input.value = '';
+                }
+            });
+
+            // Optionally, send message when pressing Enter
+            input.addEventListener('keypress', (e) => {
+                if (e.key === 'Enter') sendBtn.click();
+            });
+        </script>
+    </body>
+</html>
